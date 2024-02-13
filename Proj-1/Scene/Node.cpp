@@ -19,18 +19,20 @@ void Node::PrintAllChildren() {
         curr = curr->parent;
         tabs++;
     }
-    for (const Node* i : children) {
+    for (Node* i : children) {
         for (int i = 0; i < tabs + 1; i++)
             std::cout << "\t";
         std::cout << i->name << std::endl;
+        i->PrintAllChildren(tabs + 1);
     }
 }
 
 void Node::PrintAllChildren(int depth) {
-    for (const Node* i : children) {
+    for (Node* i : children) {
         for (int i = 0; i < depth + 1; i++)
             std::cout << "\t";
         std::cout << i->name << std::endl;
+        i->PrintAllChildren(depth + 1);
     }
 }
 
