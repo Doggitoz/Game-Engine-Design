@@ -13,7 +13,7 @@ int main() {
         cin >> in;
         cout << endl;
         if (in == "help") {
-
+            cout << "Available commands: view_scene | add_node | add_camera | select_node | view_properties | modify_transform | quit" << endl;
         }
         else if (in == "view_scene") {
             godot.Scene.ViewHierarchy();
@@ -54,9 +54,6 @@ int main() {
                 cout << "No node selected." << endl;
                 break;
             }
-        }
-        else if (in == "quit") {
-            break;
         }
         else {
             cout << "Unknown command. Type help for commands." << endl;

@@ -7,5 +7,4 @@
 class Spatial : public Node {
     public:
         Transform* transform;
-        Spatial();
 };
