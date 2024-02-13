@@ -1,8 +1,8 @@
+#pragma once
+
 #include <string>
+#include <vector>
 
 class Object {
-    public:
-        Object* parent;
-        std::string name;
-        std::vector<Object*> children;
+    
 };
