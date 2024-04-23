@@ -22,6 +22,27 @@ Node::Node() {
     Node("Node");
 }
 
+
+#pragma region Game Loop
+
+Node::Start() {
+    for (Monobehaviour* m : scripts) {
+        m->Start();
+    }
+}
+
+Node::Update() {
+    for (Monobehaviour* m : scripts) {
+        m->Update();
+    }
+}
+
+void Node::AssignScript(Monobehaviour m) {
+    scripts.push_back(m);
+}
+
+#pragma endregion
+
 void Node::PrintAllChildren() {
     PrintAllChildren(0);
 }

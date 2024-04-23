@@ -12,3 +12,7 @@ Transform::Transform(Vector3* p, Vector3* s, Vector3* r) {
     this->rotation = r;
 }
 
+std::ostream& operator<<(std::ostream& os, const Transform& t) {
+    
+    return os;
+}

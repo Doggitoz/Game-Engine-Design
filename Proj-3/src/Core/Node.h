@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "../Component/Transform.h"
+#include "../Monobehaviour/Monobehaviour.h"
 
 class Node {
     public:
@@ -11,7 +12,9 @@ class Node {
         Node(std::string name, Node parent);
         Node();
         std::string name;
-        std::vector<Node*> children;
+        void Start();
+        void Update();
+        void AssignScript(std::string path);
         void SetParent(Node node);
         void PrintAllChildren();
         void PrintAllChildren(int depth);
@@ -22,4 +25,7 @@ class Node {
         void PrintDetails();
     private:
         Node* parent;
+        std::vector<Node*> children;
+        std::vector<Monobehaviour*> scripts;
+
 };
