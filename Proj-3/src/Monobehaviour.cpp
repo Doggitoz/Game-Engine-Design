@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../Component/Transform.h"
-
-class Node;
+#include "Transform.cpp"
+#include "Node.cpp"
 
 class Monobehaviour {
     public:
+        Monobehaviour(Node* n) { node = n; };
         Node* node;
         Transform transform;
         virtual void Start();

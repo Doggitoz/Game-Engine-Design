@@ -4,10 +4,10 @@
 #include <tchar.h>
 #include <windows.h>
 #include <chrono>
-#include "../Core/SceneTree.h"
-#include "../Core/Node.h"
-#include "../Data/Vector3.h"
-#include "../Monobehaviour/Monobehaviour.h"
+#include "SceneTree.cpp"
+#include "Node.cpp"
+#include "Vector3.cpp"
+#include "Monobehaviour.cpp"
 
 using namespace std;
 
@@ -111,8 +111,6 @@ int main() {
     double checkSum = 0;
     while (true) {
         _time.Tick();
-        checkSum += _time.deltaTime;
-        cout << "Time: " << _time._time.deltaTime << endl;
     }
     return 0;
 }

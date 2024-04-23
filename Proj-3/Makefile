@@ -1,3 +1,3 @@
 
 MyGodot:
-	g++ -o MyGodot src/Main/MyGodot.cpp src/Data/Vector3.cpp
+	g++ -o MyGodot src/MyGodot.cpp
