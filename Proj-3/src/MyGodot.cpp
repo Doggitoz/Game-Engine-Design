@@ -3,11 +3,14 @@
 #include <cmath>
 #include <tchar.h>
 #include <windows.h>
-#include <chrono>
+#include <fstream>
 #include "SceneTree.cpp"
 #include "Node.cpp"
 #include "Vector3.cpp"
 #include "Monobehaviour.cpp"
+#include "CubeTwo.cpp"
+#include "CubeThree.cpp"
+#include "Time.cpp"
 
 using namespace std;
 
@@ -23,68 +26,27 @@ void System(string cmd) {
     );
 }
 
-#pragma region Time
 
-class Time {
-    public:
-        Time();
-        void Tick();
-        static double time;
-        static double deltaTime;
-    private:
-        chrono::high_resolution_clock::time_point startTime;
-        chrono::high_resolution_clock::time_point prevTime;
-};
-
-double Time::time = 0;
-double Time::deltaTime = 0;
-
-Time::Time() {
-    startTime = chrono::high_resolution_clock::now();
-    prevTime = chrono::high_resolution_clock::now();
+vector<string> ReadInPrefab(string prefabName) {
+    vector<string> lines;
+    string path = "./Prefabs/" + prefabName + ".prefab";
+    ifstream myfile(path);
+    if (myfile.is_open()) {
+        string line;
+        while (getline(myfile, line)) {
+            cout << line << endl;
+            lines.push_back(line);
+        }
+        myfile.close();
+    } else {
+        cout << "faiiled to open file: " << path << endl;
+    }
+    return lines;
 }
 
-void Time::Tick() {
-    auto now = chrono::high_resolution_clock::now();
-    auto now_ms = chrono::time_point_cast<chrono::milliseconds>(now);
-    auto total = now_ms - chrono::time_point_cast<chrono::milliseconds>(startTime);
-    auto delta = now_ms - chrono::time_point_cast<chrono::milliseconds>(prevTime);
-    prevTime = now;
-    time = ((double) total.count()) / 1000;
-    deltaTime = ((double) delta.count()) / 1000;
+void WriteObjects() {
+    
 }
-
-#pragma endregion
-
-#pragma region Scripts
-class CubeThree : public Monobehaviour {
-    public:
-        void Start();
-        void Update();
-};
-
-class CubeTwo : public Monobehaviour {
-    public:
-        void Start();
-        void Update();
-};
-
-void CubeTwo::Start() {
-    cout << "test!" << endl;
-}
-
-void CubeTwo::Update() {
-    cout << "updating!" << endl;
-}
-
-void CubeThree::Start() {
-    cout << "test!" << endl;
-}
-
-void CubeThree::Update() {
-    cout << "updating!" << endl;
-}
-#pragma endregion
 
 static Time _time;
 SceneTree currentScene;
@@ -99,6 +61,7 @@ int main() {
     currentScene = SceneTree();
 
     // Read in all obj files on initialization
+    vector<string> test = ReadInPrefab("Cube1");
 
     /*
     for each gameobject in each scene (probably jsut one scene)
