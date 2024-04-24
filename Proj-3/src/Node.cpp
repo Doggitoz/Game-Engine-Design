@@ -12,7 +12,7 @@ using namespace std;
 class Node {
     public:
         Transform transform;
-        Node(string name, vector<string> mesh)
+        Node(string name, vector<string> mesh);
         Node(string name);
         Node();
         string name;

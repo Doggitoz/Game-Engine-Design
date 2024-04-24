@@ -1,11 +1,13 @@
 #include <iostream>
+#include "Time.cpp"
 
 using namespace std;
 
 class CubeThree : public Monobehaviour {
     public:
-        void Start();
-        void Update();
+        CubeThree(Node* n) : Monobehaviour(n) {}
+        void Start() override;
+        void Update() override;
 };
 
 
@@ -14,5 +16,5 @@ void CubeThree::Start() {
 }
 
 void CubeThree::Update() {
-    cout << "updating!" << endl;
+    transform.position->y = sin(Time::time);
 }

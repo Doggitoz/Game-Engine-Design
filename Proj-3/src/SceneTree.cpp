@@ -8,11 +8,10 @@ class SceneTree {
     public:
         void Start();
         void Update();
-        void AddNode(Node* obj);
+        Node* AddNode(Node* obj);
         void AddScript(Monobehaviour* m);
         void ViewHierarchy();
         Node* GetNodeByName(std::string name);
-    private:
         std::vector<Monobehaviour*> scripts;
         std::vector<Node*> nodes;
 };
@@ -30,8 +29,9 @@ void SceneTree::Update() {
     }
 }
 
-void SceneTree::AddNode(Node* obj) {
+Node* SceneTree::AddNode(Node* obj) {
     nodes.push_back(obj);
+    return obj;
 }
 
 void SceneTree::AddScript(Monobehaviour* m) {

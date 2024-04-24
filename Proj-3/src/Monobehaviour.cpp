@@ -5,9 +5,9 @@
 
 class Monobehaviour {
     public:
-        Monobehaviour(Node* n) { node = n; };
+        Monobehaviour(Node* n) { node = n; transform = n->transform; };
         Node* node;
         Transform transform;
-        virtual void Start();
-        virtual void Update();
+        virtual void Start() {};
+        virtual void Update() {};
 };
