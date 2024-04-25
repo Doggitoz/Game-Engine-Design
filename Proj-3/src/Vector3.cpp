@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <string>
+#include "Utils.cpp"
+
+using namespace std;
 
 class Vector3 {
     public:
@@ -12,6 +15,7 @@ class Vector3 {
         Vector3(float x, float y, float z);
         Vector3 operator+(Vector3 v);
         void operator+=(Vector3 v);
+        string toString();
 };
 std::ostream& operator<<(std::ostream& os, const Vector3& v);
 
@@ -41,4 +45,8 @@ void Vector3::operator+=(Vector3 v) {
     this->x = this->x + v.x;
     this->y = this->y + v.y;
     this->z = this->z + v.z;
+}
+
+string Vector3::toString() {
+    return Utils::Truncate(x) + "," + Utils::Truncate(y) + "," + Utils::Truncate(z);
 }

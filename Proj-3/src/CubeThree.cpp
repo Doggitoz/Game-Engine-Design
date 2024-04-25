@@ -5,7 +5,7 @@ using namespace std;
 
 class CubeThree : public Monobehaviour {
     public:
-        CubeThree(Node* n) : Monobehaviour(n) {}
+        CubeThree() : Monobehaviour() {}
         void Start() override;
         void Update() override;
 };

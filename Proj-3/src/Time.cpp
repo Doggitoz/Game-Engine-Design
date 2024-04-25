@@ -8,6 +8,7 @@ class Time {
         void Tick();
         static double time;
         static double deltaTime;
+        static double fixedInterval;
     private:
         chrono::high_resolution_clock::time_point startTime;
         chrono::high_resolution_clock::time_point prevTime;
@@ -15,6 +16,7 @@ class Time {
 
 double Time::time = 0;
 double Time::deltaTime = 0;
+double Time::fixedInterval = 1/60;
 
 Time::Time() {
     startTime = chrono::high_resolution_clock::now();

@@ -8,34 +8,38 @@ class SceneTree {
     public:
         void Start();
         void Update();
+        void FixedUpdate();
         Node* AddNode(Node* obj);
-        void AddScript(Monobehaviour* m);
         void ViewHierarchy();
         Node* GetNodeByName(std::string name);
-        std::vector<Monobehaviour*> scripts;
         std::vector<Node*> nodes;
 };
 
 
 void SceneTree::Start() {
-    for (Monobehaviour* m : scripts) {
-        m->Start();
+    for (Node* n : nodes) {
+        for (Monobehaviour* m : n->components)
+            m->Start();
     }
 }
 
 void SceneTree::Update() {
-    for (Monobehaviour* m : scripts) {
-        m->Update();
+    for (Node* n : nodes) {
+        for (Monobehaviour* m : n->components)
+            m->Update();
+    }
+}
+
+void SceneTree::FixedUpdate() {
+    for (Node* n : nodes) {
+        for (Monobehaviour* m : n->components)
+            m->FixedUpdate();
     }
 }
 
 Node* SceneTree::AddNode(Node* obj) {
     nodes.push_back(obj);
     return obj;
-}
-
-void SceneTree::AddScript(Monobehaviour* m) {
-    scripts.push_back(m);
 }
 
 Node* SceneTree::GetNodeByName(std::string name) {

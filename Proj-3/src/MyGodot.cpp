@@ -5,6 +5,8 @@
 #include <windows.h>
 #include <sstream>
 #include <fstream>
+#include <future>
+#include <thread>
 #include "SceneTree.cpp"
 #include "Node.cpp"
 #include "Vector3.cpp"
@@ -12,6 +14,7 @@
 #include "CubeTwo.cpp"
 #include "CubeThree.cpp"
 #include "Time.cpp"
+#include "Mesh.cpp"
 
 using namespace std;
 
@@ -45,44 +48,79 @@ vector<string> ReadInPrefab(string prefabName) {
     return lines;
 }
 
-void WriteObjects(SceneTree scene) {
-    string path = "./objects.obj";
-    ofstream outputFile(path, ios::out | ios::trunc);
-    if (outputFile.is_open()) {
-        // Need to add important fields here
-        outputFile << "v,0,0.99,2.4,1.5," << endl << "u,0,1,0," << endl << "r,1,0,0," << endl << "f,0,0,-1," << endl <<
-            "l,1,1,1,0.7," << endl << "q,0,1.5,1.2,0.005," << endl << "________________" << endl;
-        for (Node* n : scene.nodes) {
-            for (string str : n->mesh) {
-                // Need to split and apply transforms here.
-                vector<string> tokens;
-                istringstream iss(str);
-                string token;
-                while (getline(iss, token, ',')) {
-                    tokens.push_back(token);
-                }
-                string out;
-                if (tokens.size() == 0) {
-                    out = str;
-                } else if (tokens.at(0) == "p") {
-                    out = "p,";
-                    // Apply transformations
-                    float newX = stof(tokens.at(1)) * n->transform.scale->x + n->transform.position->x;
-                    out.append(to_string(newX) + ",");
-                    float newY = stof(tokens.at(2)) * n->transform.scale->y + n->transform.position->y;
-                    out.append(to_string(newY)+ ",");
-                    float newZ = stof(tokens.at(3)) * n->transform.scale->z + n->transform.position->z;
-                    out.append(to_string(newZ)+ ",");
-                } else {
-                    out = str;
-                }
-                outputFile << out << endl;
+vector<string> sceneToObj(SceneTree scene) {
+    vector<string> lines {
+        "v,0,0.99,2.4,1.5",
+        "u,0,1,0",
+        "r,1,0,0",
+        "f,0,0,-1",
+        "l,1,1,1,0.7",
+        "q,0,1.5,1.2,0.005"
+    };
+
+    // Need to get camera details here.
+
+    // Get each light here.
+    for (Node* n : scene.nodes) {
+        if (!n->hasMesh) continue;
+        lines.push_back("________________");
+        for (int i = 0; i < n->mesh.header.size(); i++) {
+            char label = n->mesh.header.at(i);
+            string header(1, label);
+            Vector3 v = n->mesh.data.at(i);
+            if (label == '_') {
+                lines.push_back("________________");
+                continue;
             }
-            outputFile << "________________" << endl;
+            if (label == 'p') {
+                v += *(n->transform.position);
+            }
+            // add other cases here if desired
+            lines.push_back(header + "," + v.toString());
         }
-    } else {
-        cout << "unable to open objects file" << endl;
     }
+
+    return lines;
+}
+
+future<void> WriteObjects(SceneTree scene) {
+    string path = "./objects.obj";
+    vector<string> lines = sceneToObj(scene);
+
+    // Open the output file in binary mode
+    ofstream outfile(path, std::ios::binary);
+    if (!outfile) {
+        return;
+    }
+
+    // Determine an appropriate buffer size for batching writes
+    const size_t bufferSize = 1024;  // Adjust buffer size as needed
+
+    // Buffer for accumulating string data
+    string buffer;
+    buffer.reserve(bufferSize);
+
+    // Iterate over each string in the vector
+    for (const string& str : lines) {
+        // Append the current string and a newline character to the buffer
+        buffer += str + '\n';
+
+        // If buffer size reaches the threshold, write its contents to the file
+        if (buffer.size() >= bufferSize) {
+            outfile.write(buffer.data(), buffer.size());
+            buffer.clear(); // Reset the buffer after writing
+        }
+    }
+
+    // Write any remaining data in the buffer to the file
+    if (!buffer.empty()) {
+        outfile.write(buffer.data(), buffer.size());
+        buffer.clear();
+    }
+
+    // Close the output file
+    outfile.close();
+    
 }
 
 #pragma endregion
@@ -105,20 +143,34 @@ int main() {
     // Read in all obj files on initialization
     Node* CubeOneNode = currentScene.AddNode(new Node("Cube1", ReadInPrefab("Cube1")));
     Node* CubeTwoNode = currentScene.AddNode(new Node("Cube2", ReadInPrefab("Cube2")));
-    currentScene.AddScript(new CubeTwo(CubeTwoNode));
+    Monobehaviour* cubeTwoScript = new CubeTwo();
+    CubeTwoNode->AddComponent(cubeTwoScript);
     Node* CubeThreeNode = currentScene.AddNode(new Node("Cube3", ReadInPrefab("Cube3")));
-    currentScene.AddScript(new CubeThree(CubeThreeNode));
+    Monobehaviour* cubeThreeScript = new CubeThree();
+    CubeThreeNode->AddComponent(cubeThreeScript);
 
     // Start Direct3D
+    cout << "Launching Direct3D..." << endl;
     System((string)"Direct3D.exe");
 
     currentScene.Start();
-    float interval = 0.1;
+    float interval = 1/60;
+    float fixedCounter = 0;
     float localTime = TimeLi();
     while (true) {
         _time.Tick();
+        future<void> render = WriteObjects(currentScene);
+        currentScene.Update();
+        fixedCounter += Time::deltaTime;
+
+        if (fixedCounter > Time::fixedInterval) {
+            currentScene.FixedUpdate();
+        }
+
+        // if (Time::deltaTime != 0)
+        //     WriteObjects(currentScene);
+
         if (localTime<TimeLi()) {
-            currentScene.Update();
             WriteObjects(currentScene);
             localTime += interval;
         }
