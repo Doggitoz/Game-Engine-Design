@@ -5,8 +5,6 @@
 #include <windows.h>
 #include <sstream>
 #include <fstream>
-#include <future>
-#include <thread>
 #include "SceneTree.cpp"
 #include "Node.cpp"
 #include "Vector3.cpp"
@@ -83,7 +81,7 @@ vector<string> sceneToObj(SceneTree scene) {
     return lines;
 }
 
-future<void> WriteObjects(SceneTree scene) {
+void WriteObjects(SceneTree scene) {
     string path = "./objects.obj";
     vector<string> lines = sceneToObj(scene);
 
@@ -120,7 +118,6 @@ future<void> WriteObjects(SceneTree scene) {
 
     // Close the output file
     outfile.close();
-    
 }
 
 #pragma endregion
@@ -153,27 +150,30 @@ int main() {
     cout << "Launching Direct3D..." << endl;
     System((string)"Direct3D.exe");
 
-    currentScene.Start();
-    float interval = 1/60;
+    // Clock variables
+    float interval = 0.016666666;
+    float frameCounter = 0;
     float fixedCounter = 0;
     float localTime = TimeLi();
+
+    currentScene.Start();
     while (true) {
         _time.Tick();
-        future<void> render = WriteObjects(currentScene);
+
         currentScene.Update();
         fixedCounter += Time::deltaTime;
+        frameCounter += Time::deltaTime;
 
         if (fixedCounter > Time::fixedInterval) {
             currentScene.FixedUpdate();
         }
 
-        // if (Time::deltaTime != 0)
-        //     WriteObjects(currentScene);
-
-        if (localTime<TimeLi()) {
+        // Render
+        if (frameCounter > interval) {
             WriteObjects(currentScene);
-            localTime += interval;
+            frameCounter = 0;
         }
+        
     }
     return 0;
 }
