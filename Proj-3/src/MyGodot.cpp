@@ -5,6 +5,9 @@
 #include <windows.h>
 #include <sstream>
 #include <fstream>
+#include <cstdio>
+#include <filesystem>
+#include <future>
 #include "SceneTree.cpp"
 #include "Node.cpp"
 #include "Vector3.cpp"
@@ -47,14 +50,15 @@ vector<string> ReadInPrefab(string prefabName) {
 }
 
 vector<string> sceneToObj(SceneTree scene) {
-    vector<string> lines {
-        "v,0,0.99,2.4,1.5",
-        "u,0,1,0",
-        "r,1,0,0",
-        "f,0,0,-1",
-        "l,1,1,1,0.7",
-        "q,0,1.5,1.2,0.005"
-    };
+    vector<string> lines;
+
+    lines.push_back("v," + SceneTree::mainCamera->position.toString());
+    lines.push_back("u," + SceneTree::mainCamera->up.toString());
+    lines.push_back("r," + SceneTree::mainCamera->right.toString());
+    lines.push_back("f," + SceneTree::mainCamera->forward.toString());
+
+    lines.push_back("l,1,1,1,0.7");
+    lines.push_back("q,0,1.5,1.2,0.005");
 
     // Need to get camera details here.
 
@@ -82,17 +86,18 @@ vector<string> sceneToObj(SceneTree scene) {
 }
 
 void WriteObjects(SceneTree scene) {
-    string path = "./objects.obj";
+    string obj = "./objects.obj";
+
     vector<string> lines = sceneToObj(scene);
 
     // Open the output file in binary mode
-    ofstream outfile(path, std::ios::binary);
+    ofstream outfile(obj, std::ios::binary);
     if (!outfile) {
         return;
     }
 
     // Determine an appropriate buffer size for batching writes
-    const size_t bufferSize = 1024;  // Adjust buffer size as needed
+    const size_t bufferSize = 1024 * 2;  // Adjust buffer size as needed
 
     // Buffer for accumulating string data
     string buffer;
@@ -125,10 +130,6 @@ void WriteObjects(SceneTree scene) {
 static Time _time;
 SceneTree currentScene;
 
-float TimeLi() {
-    return (float)clock()/CLOCKS_PER_SEC;
-}
-
 int main() {
     cout << "Running..." << endl;
 
@@ -146,21 +147,24 @@ int main() {
     Monobehaviour* cubeThreeScript = new CubeThree();
     CubeThreeNode->AddComponent(cubeThreeScript);
 
+    // System((string)"Godot.exe");
+    // return 0;
+
     // Start Direct3D
     cout << "Launching Direct3D..." << endl;
     System((string)"Direct3D.exe");
 
     // Clock variables
-    float interval = 0.016666666;
+    float interval = 0.03333;
     float frameCounter = 0;
     float fixedCounter = 0;
-    float localTime = TimeLi();
 
     currentScene.Start();
     while (true) {
         _time.Tick();
 
         currentScene.Update();
+        SceneTree::mainCamera->Update();
         fixedCounter += Time::deltaTime;
         frameCounter += Time::deltaTime;
 

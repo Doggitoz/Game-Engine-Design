@@ -12,9 +12,9 @@ class CubeTwo : public Monobehaviour {
 
 
 void CubeTwo::Start() {
-    cout << "test!" << endl;
+    //cout << "test!" << endl;
 }
 
 void CubeTwo::Update() {
-    transform.scale = new Vector3(abs(cos(Time::time)), abs(sin(Time::time)), abs(tan(Time::time)));
+    //transform.scale = new Vector3(abs(cos(Time::time)), abs(sin(Time::time)), abs(tan(Time::time)));
 }

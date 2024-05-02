@@ -48,9 +48,7 @@ Node* Node::operator*() {
 }
 
 void Node::PrintDetails() {
-    cout << "Name: " << this->name << endl;
-    cout << "Transform" << endl;
-    cout << "\t" << transform;
+
 }
 
 void Node::AddComponent(Monobehaviour* m) {

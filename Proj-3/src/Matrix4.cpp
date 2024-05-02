@@ -16,6 +16,9 @@ class Matrix4 {
         Matrix4(float x, float y, float z, float w);
         Matrix4 operator+(Matrix4 m);
         void operator+=(Matrix4 m);
+        void operator+=(Vector3 v);
+        void operator-=(Matrix4 m);
+        void operator-=(Vector3 v);
         string toString();
 };
 std::ostream& operator<<(std::ostream& os, const Matrix4& m);
@@ -51,6 +54,25 @@ void Matrix4::operator+=(Matrix4 m) {
     this->w = this->w + m.w;
 }
 
-void Matrix4::toString() {
+void Matrix4::operator+=(Vector3 v) {
+    this->x = this->x + v.x;
+    this->y = this->y + v.y;
+    this->z = this->z + v.z;
+}
+
+void Matrix4::operator-=(Matrix4 m) {
+    this->x = this->x - m.x;
+    this->y = this->y - m.y;
+    this->z = this->z - m.z;
+    this->w = this->w - m.w;
+}
+
+void Matrix4::operator-=(Vector3 v) {
+    this->x = this->x - v.x;
+    this->y = this->y - v.y;
+    this->z = this->z - v.z;
+}
+
+string Matrix4::toString() {
     return Utils::Truncate(x) + "," + Utils::Truncate(y) + "," + Utils::Truncate(z) + "," + Utils::Truncate(w);
 }

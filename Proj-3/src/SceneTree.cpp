@@ -2,6 +2,7 @@
 
 #include "Node.cpp"
 #include "Monobehaviour.cpp"
+#include "Camera.cpp"
 #include <vector>
 
 class SceneTree {
@@ -13,8 +14,10 @@ class SceneTree {
         void ViewHierarchy();
         Node* GetNodeByName(std::string name);
         std::vector<Node*> nodes;
+        static Camera* mainCamera;
 };
 
+Camera* SceneTree::mainCamera = new Camera();
 
 void SceneTree::Start() {
     for (Node* n : nodes) {

@@ -65,7 +65,8 @@
         "xloctime": "cpp",
         "xtree": "cpp",
         "fstream": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "filesystem": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled",
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"

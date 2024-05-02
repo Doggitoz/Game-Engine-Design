@@ -12,7 +12,7 @@ class CubeThree : public Monobehaviour {
 
 
 void CubeThree::Start() {
-    cout << "test!" << endl;
+    //cout << "test!" << endl;
 }
 
 void CubeThree::Update() {

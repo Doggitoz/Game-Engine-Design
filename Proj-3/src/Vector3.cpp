@@ -14,11 +14,11 @@ class Vector3 {
         Vector3();
         Vector3(float x, float y, float z);
         Vector3 operator+(Vector3 v);
+        Vector3 operator*(float f);
+        Vector3 operator*(double d);
         void operator+=(Vector3 v);
         string toString();
 };
-std::ostream& operator<<(std::ostream& os, const Vector3& v);
-
 
 Vector3::Vector3() {
     this->x = 0;
@@ -32,13 +32,16 @@ Vector3::Vector3(float x, float y, float z) {
     this->z = z;
 }
 
-std::ostream& operator<<(std::ostream& os, const Vector3& v) {
-    os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
-    return os;
-}
-
 Vector3 Vector3::operator+(Vector3 v) {
     return Vector3(this->x + v.x, this->y + v.y, this->z + v.z);
+}
+
+Vector3 Vector3::operator*(float f) {
+    return Vector3(this->x * f, this->y * f, this->z * f);
+}
+
+Vector3 Vector3::operator*(double d) {
+    return Vector3(this->x * d, this->y * d, this->z * d);
 }
 
 void Vector3::operator+=(Vector3 v) {
