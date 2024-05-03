@@ -16,6 +16,8 @@
 #include "CubeThree.cpp"
 #include "Time.cpp"
 #include "Mesh.cpp"
+#include "Matrix4.cpp"
+#include "Rigidbody.cpp"
 
 using namespace std;
 
@@ -75,7 +77,11 @@ vector<string> sceneToObj(SceneTree scene) {
                 continue;
             }
             if (label == 'p') {
+                Vector3 scale = *(n->transform.scale);
                 v += *(n->transform.position);
+                v.x *= scale.x;
+                v.y *= scale.y;
+                v.z *= scale.z;
             }
             // add other cases here if desired
             lines.push_back(header + "," + v.toString());
@@ -140,19 +146,35 @@ int main() {
 
     // Read in all obj files on initialization
     Node* CubeOneNode = currentScene.AddNode(new Node("Cube1", ReadInPrefab("Cube1")));
-    Node* CubeTwoNode = currentScene.AddNode(new Node("Cube2", ReadInPrefab("Cube2")));
-    Monobehaviour* cubeTwoScript = new CubeTwo();
-    CubeTwoNode->AddComponent(cubeTwoScript);
-    Node* CubeThreeNode = currentScene.AddNode(new Node("Cube3", ReadInPrefab("Cube3")));
-    Monobehaviour* cubeThreeScript = new CubeThree();
-    CubeThreeNode->AddComponent(cubeThreeScript);
+
+    Node* CubePhysOne = currentScene.AddNode(new Node("CubePhys1", ReadInPrefab("Cube2")));
+    *CubePhysOne->transform.position += Vector3(.1, .7, .1);
+    Rigidbody* rOne = new Rigidbody(7, -9.8);
+    rOne->Setup(CubePhysOne, CubePhysOne->transform);
+
+    Node* CubePhysTwo = currentScene.AddNode(new Node("CubePhys2", ReadInPrefab("Cube2")));
+    *CubePhysTwo->transform.position += Vector3(-1, 1, .1);
+    Rigidbody* rTwo = new Rigidbody(10, -9.8);
+    rTwo->Setup(CubePhysTwo, CubePhysTwo->transform);
+
+    Node* CubePhysThree = currentScene.AddNode(new Node("CubePhys3", ReadInPrefab("Cube2")));
+    *CubePhysThree->transform.position += Vector3(-.3, .3, .5);
+    Rigidbody* rThree = new Rigidbody(10, -9.8);
+    rThree->Setup(CubePhysThree, CubePhysThree->transform);
+    
+    vector<Rigidbody*> bodies;
+    bodies.push_back(rOne);
+    bodies.push_back(rTwo);
+    bodies.push_back(rThree);
+
+
 
     // Start Direct3D
     cout << "Launching Direct3D..." << endl;
     System((string)"Direct3D.exe");
 
     // Clock variables
-    float interval = 0.03333;
+    float interval = 0.03;
     float frameCounter = 0;
     float fixedCounter = 0;
 
@@ -162,17 +184,39 @@ int main() {
 
         currentScene.Update();
         SceneTree::mainCamera->Update();
+
         fixedCounter += Time::deltaTime;
         frameCounter += Time::deltaTime;
-
-        if (fixedCounter > Time::fixedInterval) {
-            currentScene.FixedUpdate();
-        }
 
         // Render
         if (frameCounter > interval) {
             WriteObjects(currentScene);
             frameCounter = 0;
+        }
+
+        if (fixedCounter > Time::fixedInterval) {
+            #pragma region Final Exam
+            float K = 0.4f;
+            float e = 0.6f;
+            for (int i = 0; i < bodies.size(); i++) {
+                Vector3 sum = Vector3();
+                for (int j = 0; j < bodies.size(); j++) {
+                    if (i == j) continue;
+                    Vector3 diff = (*bodies[i]->transform.position - *bodies[j]->transform.position);
+                    float mag = diff.magnitude();
+                    sum += diff / ((mag * mag * mag) + e);
+                }
+                bodies[i]->acceleration = sum * K;
+            }
+
+            for (Rigidbody* r : bodies) {
+                r->FixedUpdate();
+                cout << "Cube: " << r->node->name << " " << r->transform.position->toString() << endl;
+            }
+            
+
+            #pragma endregion
+            currentScene.FixedUpdate();
         }
         
     }
